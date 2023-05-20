@@ -1,4 +1,5 @@
 django
-
 djangorestframework
-gunicorn
+django-cors-headers
+whitenoise
+python-dotenv

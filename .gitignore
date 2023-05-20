@@ -1,0 +1,6 @@
+dev/
+
+backend/dev_settings.py
+
+
+__pycache__/

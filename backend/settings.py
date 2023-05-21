@@ -48,15 +48,17 @@ INSTALLED_APPS = [
     'branch_class',
     'users',
     'attendance',
+    'students'
     
 ]
 
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ],
+
+    'SEARCH_PARAM': 'q'
     # Other settings go here
 }
 

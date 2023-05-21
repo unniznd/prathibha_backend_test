@@ -31,14 +31,3 @@ class ViewClassDivisionSerializer(serializers.ModelSerializer):
         model = ClassDivisionModel
         fields = ('class_division_id', 'branch_name', 'standard', 'division', 'medium')
     
-class ViewClassDivisionBranchSerializer(serializers.ModelSerializer):
-
-    class_division_id = serializers.IntegerField(source='id')
-    medium = serializers.SerializerMethodField()
-
-    def get_medium(self, obj):
-        return obj.get_medium_display()
-    
-    class Meta:
-        model = ClassDivisionModel
-        fields = ('class_division_id', 'standard', 'division', 'medium')

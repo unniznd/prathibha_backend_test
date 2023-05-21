@@ -15,7 +15,6 @@ from branch_class.serializers import (
 
     ViewClassDivisionSerializer,
     CreateClassDivisionSerializer, 
-    ViewClassDivisionBranchSerializer
 )
 from branch_class.models import OfficeBranchModel, ClassDivisionModel
 
@@ -112,6 +111,22 @@ def delete_class_division(request, id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, IsAdminUserOrBranchAdminUser])
 def get_class_division_branch_wise(request, branch_id):
-    division = ClassDivisionModel.objects.filter(branch=branch_id)
-    division_serial = ViewClassDivisionBranchSerializer(division, many=True)
-    return Response({'status':True, 'data':division_serial.data}, status=status.HTTP_200_OK)
+    class_division = ClassDivisionModel.objects.filter(branch_id=branch_id)
+    classes = set()
+    divisions = {}
+    
+    for division in class_division:
+        classes.add(division.standard)
+    
+    for class_ in classes:
+        divisions[class_] = []
+        for division in class_division:
+            if division.standard == class_:
+                divisions[class_].append(division.division)
+        
+        divisions[class_] = sorted(divisions[class_])
+
+    
+    return Response({'status':True, 'data':[classes, divisions,]}, status=status.HTTP_200_OK)
+
+    

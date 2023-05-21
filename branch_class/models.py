@@ -24,3 +24,4 @@ class ClassDivisionModel(models.Model):
 
     def __str__(self) -> str:
         return f"{self.branch.branch_name} - {self.standard} - {self.division}"
+

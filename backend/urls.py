@@ -10,6 +10,6 @@ urlpatterns = [
     path('login/', ObtainAuthTokenWithUserId.as_view()),
     path('dashboard/', GetDashboardDetails.as_view()),
 
-    path('superuser/branch/', include('branch_class.urls')),
+    path('branch/', include('branch_class.urls')),
     path('students/', include('students.urls'))
 ]

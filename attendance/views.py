@@ -62,7 +62,7 @@ class StudentAttendanceView(ListAPIView):
         queryset = queryset.filter(student_branch__branch=branch_id)
         
         
-
+        
 
         for query in queryset:
             attendace = Attendace.objects.filter(
@@ -75,16 +75,21 @@ class StudentAttendanceView(ListAPIView):
             else:
                 query.is_absent = False
             
+            query.save()
+                
             
+            
+           
         queryset = self.filter_queryset(queryset)
 
         attendance_filter = self.request.query_params.get('attendance')
+        if attendance_filter:
+            if attendance_filter == 'present':
+                queryset = queryset.filter(is_absent=False)
+            elif attendance_filter == 'absent':
+                queryset = queryset.filter(is_absent=True)
 
-        if attendance_filter == 'absent':  # Filter for absent students
-            queryset = queryset.filter(is_absent=True)
-        elif attendance_filter == 'present':  # Filter for present students
-            queryset = queryset.filter(is_absent=False)
-
+        
         serializer = self.serializer_class(
             queryset,
             context={

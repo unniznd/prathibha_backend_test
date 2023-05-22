@@ -42,7 +42,7 @@ class ViewStudents(ListAPIView):
         queryset = self.get_queryset()
         queryset = queryset.filter(student_branch__branch=branch_id)
         queryset = self.filter_queryset(queryset)
-        serializer = ViewStudentSerializer(queryset, many=True)
+        serializer = ViewStudentSerializer(queryset.order_by('admission_number'), many=True)
         return Response({
             "status":True, 
             "data":serializer.data

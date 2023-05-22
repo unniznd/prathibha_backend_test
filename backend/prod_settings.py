@@ -4,13 +4,14 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
+load_dotenv('../.env')
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 SECRET_KEY = os.getenv("SECRET_KEY")
+
 
 CORS_ALLOW_HEADERS = ['*']
 

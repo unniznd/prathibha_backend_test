@@ -62,7 +62,7 @@ class StudentAttendanceView(ListAPIView):
         queryset = queryset.filter(student_branch__branch=branch_id)
         
         
-        
+        absent_count = 0
 
         for query in queryset:
             attendace = Attendace.objects.filter(
@@ -75,12 +75,14 @@ class StudentAttendanceView(ListAPIView):
             else:
                 query.is_absent = False
             
+
             query.save()
                 
             
             
            
         queryset = self.filter_queryset(queryset)
+        absent_count = queryset.filter(is_absent=True).count()
 
         attendance_filter = self.request.query_params.get('attendance')
         if attendance_filter:
@@ -100,5 +102,7 @@ class StudentAttendanceView(ListAPIView):
             "status":True,
             "date":formatted_date,
             "is_holiday":False,
+            "total_count":queryset.count(),
+            "absent_count":absent_count,
             "data":serializer.data,
         }, status=status.HTTP_200_OK)

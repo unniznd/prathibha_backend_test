@@ -62,6 +62,11 @@ REST_FRAMEWORK = {
     # Other settings go here
 }
 
+DATE_INPUT_FORMATS = [
+    '%Y-%m-%d',  
+    '%B %d, %Y',  
+]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

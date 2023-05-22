@@ -11,5 +11,6 @@ urlpatterns = [
     path('dashboard/', GetDashboardDetails.as_view()),
 
     path('branch/', include('branch_class.urls')),
-    path('students/', include('students.urls'))
+    path('students/', include('students.urls')),
+    path('attendance/', include('attendance.urls')),
 ]

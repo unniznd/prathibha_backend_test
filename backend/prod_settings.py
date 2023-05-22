@@ -1,16 +1,11 @@
 import os
 from pathlib import Path
 
-from dotenv import load_dotenv
-import os
-
-load_dotenv('../.env')
-
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = "5hx0o22)_aj)qre_lny=1a2e4j#(kab%w%&93aih@%s9mabkk6"
 
 
 CORS_ALLOW_HEADERS = ['*']

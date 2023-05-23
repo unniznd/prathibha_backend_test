@@ -23,12 +23,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 if DEBUG:
     from .dev_settings import *
 else:
     from .prod_settings import *
+
+
+
+
 
 
 
@@ -66,6 +70,12 @@ DATE_INPUT_FORMATS = [
     '%Y-%m-%d',  
     '%B %d, %Y',  
 ]
+
+
+CORS_ALLOW_HEADERS = ['*']
+
+CORS_ALLOW_ALL_ORIGINS = True
+
 
 
 MIDDLEWARE = [

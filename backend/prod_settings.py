@@ -8,12 +8,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "5hx0o22)_aj)qre_lny=1a2e4j#(kab%w%&93aih@%s9mabkk6"
 
 
-CORS_ALLOW_HEADERS = ['*']
-
-CORS_ALLOW_ALL_ORIGINS = True
-
-
-
 
 ALLOWED_HOSTS = ['*']
 

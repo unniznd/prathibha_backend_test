@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 from students.models import Students
+from branch_class.models import OfficeBranchModel
 
 def validate_date_not_future(date):
     if date > timezone.localdate():
@@ -23,9 +24,13 @@ class Attendace(models.Model):
 
 
 class Holiday(models.Model):
-    date = models.DateField(unique=True)
+    branch = models.ForeignKey(OfficeBranchModel,  on_delete=models.CASCADE)
+    date = models.DateField()
     reason = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
         return f"{self.date} {self.reason}"
+    
+    class Meta:
+        unique_together = ('branch', 'date')
 

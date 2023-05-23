@@ -9,6 +9,9 @@ class AttendanceAdmin(admin.ModelAdmin):
 
 @admin.register(Holiday)
 class HolidayAdmin(admin.ModelAdmin):
-    list_display = ('date', 'reason')
+    list_display = ('branch_name','date', 'reason')
     list_filter = ('date', 'reason')
     search_fields = ('date', 'reason')
+
+    def branch_name(self, obj):
+        return obj.branch.branch_name

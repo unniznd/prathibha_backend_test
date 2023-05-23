@@ -10,7 +10,10 @@ from datetime import datetime
 
 from students.models import Students
 from .models import Attendace, Holiday
-from .serializers import StudentAttendanceSerializer
+from .serializers import (
+    StudentAttendanceSerializer, AttendanceSerializer,
+    HolidaySerializer
+)
 
 class StudentAttendanceView(ListAPIView):
     serializer_class = StudentAttendanceSerializer
@@ -49,7 +52,10 @@ class StudentAttendanceView(ListAPIView):
 
         
         
-        holiday = Holiday.objects.filter(date=date_filter).first()
+        holiday = Holiday.objects.filter(
+            branch=branch_id,
+            date=date_filter
+        ).first()
         if holiday:
             return Response({
                 "status":True,
@@ -82,8 +88,7 @@ class StudentAttendanceView(ListAPIView):
             
            
         queryset = self.filter_queryset(queryset)
-        absent_count = queryset.filter(is_absent=True).count()
-
+        
         attendance_filter = self.request.query_params.get('attendance')
         if attendance_filter:
             if attendance_filter == 'present':
@@ -91,7 +96,8 @@ class StudentAttendanceView(ListAPIView):
             elif attendance_filter == 'absent':
                 queryset = queryset.filter(is_absent=True)
 
-        
+        absent_count = queryset.filter(is_absent=True).count()
+
         serializer = self.serializer_class(
             queryset,
             context={
@@ -106,3 +112,49 @@ class StudentAttendanceView(ListAPIView):
             "absent_count":absent_count,
             "data":serializer.data,
         }, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        attendance_serial = AttendanceSerializer(data=request.data)
+        if attendance_serial.is_valid():
+            attendance_serial.save()
+            return Response({'status':True}, status=status.HTTP_201_CREATED)
+        return Response({
+            'status':False, 
+            'errors':attendance_serial.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, *args, **kwargs):
+        if request.data['student'] and request.data['date']:
+            attendance = Attendace.objects.filter(
+                student=request.data['student'],
+                date=request.data['date']
+            ).first()
+            if attendance:
+                attendance.delete()
+        
+                return Response({'status':True}, status=status.HTTP_200_OK)
+        
+        return Response({'status':False}, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class HolidayView(ListAPIView):
+    def post(self, request, *args, **kwargs):
+        holiday_serial = HolidaySerializer(data=request.data)
+        if holiday_serial.is_valid():
+            holiday_serial.save()
+            return Response({'status':True}, status=status.HTTP_201_CREATED)
+        return Response({
+            'status':False, 
+            'errors':holiday_serial.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, *args, **kwargs):
+        if request.data['date']:
+            holiday = Holiday.objects.filter(
+                date=request.data['date'], 
+                branch=request.data['branch']
+            ).first()
+            if holiday:
+                holiday.delete()
+                return Response({'status':True}, status=status.HTTP_200_OK)
+        return Response({'status':False}, status=status.HTTP_400_BAD_REQUEST)

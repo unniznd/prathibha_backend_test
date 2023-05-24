@@ -6,13 +6,18 @@ from rest_framework.filters import SearchFilter
 
 from django.db.models import Q
 
+from datetime import datetime
+
 from .models import Students
 from .serializers import ViewStudentSerializer
+
+from users.permissions import IsAdminUserOrBranchAdminUser
+from fee.models import Fees
 
 class ViewStudents(ListAPIView):
     
     serializer_class = ViewStudentSerializer
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [IsAdminUserOrBranchAdminUser,]
     filter_backends = [SearchFilter,]
     search_fields = ['^student_name', 'admission_number']
 
@@ -47,5 +52,41 @@ class ViewStudents(ListAPIView):
             "status":True, 
             "data":serializer.data
         }, status=status.HTTP_200_OK)
-    
-    
+
+class DashboardOverview(ListAPIView):
+    permission_classes = [IsAdminUserOrBranchAdminUser,]
+
+    def get(self, request,branch_id, *args, **kwargs):
+        total_students = Students.objects.filter(
+            student_branch__branch=branch_id
+        ).count()
+        # total fee paid for this month
+        fee_paid = Fees.objects.filter(
+            month=datetime.now().month,
+            status='paid',
+            student__student_branch__branch=branch_id
+        )
+        total_fee_paid = 0
+        for fee in fee_paid:
+            total_fee_paid += fee.amount
+        
+
+        # total fee unpaid for this month
+        fee_unpaid = Fees.objects.filter(
+            month=datetime.now().month,
+            status='unpaid',
+            student__student_branch__branch=branch_id
+        )
+
+        total_fee_unpaid = 0
+        for fee in fee_unpaid:
+            total_fee_unpaid += fee.amount
+
+        return Response({
+            'status':True,
+            'total_students':total_students,
+            'total_fee_paid':total_fee_paid,
+            'total_fee_unpaid':total_fee_unpaid
+        })
+
+

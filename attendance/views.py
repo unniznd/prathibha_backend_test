@@ -8,6 +8,7 @@ from django.utils import timezone
 
 from datetime import datetime
 
+from users.permissions import IsBranchAdminUser, IsAdminUserOrBranchAdminUser
 from students.models import Students
 from .models import Attendace, Holiday
 from .serializers import (
@@ -17,7 +18,7 @@ from .serializers import (
 
 class StudentAttendanceView(ListAPIView):
     serializer_class = StudentAttendanceSerializer
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [IsAdminUserOrBranchAdminUser]
     filter_backends = [SearchFilter,]
     search_fields = ['^student_name', 'admission_number']
 
@@ -138,6 +139,7 @@ class StudentAttendanceView(ListAPIView):
     
 
 class HolidayView(ListAPIView):
+    permission_classes = [IsAdminUserOrBranchAdminUser]
     def post(self, request, *args, **kwargs):
         holiday_serial = HolidaySerializer(data=request.data)
         if holiday_serial.is_valid():
@@ -158,3 +160,55 @@ class HolidayView(ListAPIView):
                 holiday.delete()
                 return Response({'status':True}, status=status.HTTP_200_OK)
         return Response({'status':False}, status=status.HTTP_400_BAD_REQUEST)
+
+    
+class TodayAttendanceOverview(ListAPIView):
+    permission_classes = [IsAdminUserOrBranchAdminUser]
+
+    def get(self, request, branch_id, *args, **kwargs):
+        students = Students.objects.filter(
+            student_branch__branch=branch_id
+        )
+
+        # get standard division wise attendance for all standard and division
+        standard_division_wise_attendance = {}
+
+        for student in students:
+            standard = student.student_branch.standard
+            division = student.student_branch.division
+
+            if f"{standard} {division}" not in standard_division_wise_attendance:
+                standard_division_wise_attendance[f"{standard} {division}"] = {
+                    'total':0,
+                    'present':0,
+                    'absent':0
+                }
+
+            # if standard not in standard_division_wise_attendance:
+            #     standard_division_wise_attendance[standard] = {}
+            
+            # if division not in standard_division_wise_attendance[standard]:
+            #     standard_division_wise_attendance[standard][division] = {
+            #         'total':0,
+            #         'present':0,
+            #         'absent':0
+            #     }
+            
+            attendance = Attendace.objects.filter(
+                student=student,
+                date=timezone.localdate()
+            ).first()
+
+            standard_division_wise_attendance[f"{standard} {division}"]['total'] += 1
+            if attendance:
+                standard_division_wise_attendance[f"{standard} {division}"]['absent'] += 1
+                
+            else:
+                standard_division_wise_attendance[f"{standard} {division}"]['present'] += 1
+        
+        return  Response({
+            "status":True,
+            "data":standard_division_wise_attendance
+        }, status=status.HTTP_200_OK)
+                    
+        

@@ -52,7 +52,8 @@ INSTALLED_APPS = [
     'branch_class',
     'users',
     'attendance',
-    'students'
+    'students',
+    'fee',
     
 ]
 
